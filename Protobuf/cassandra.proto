@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+message InitReplicaCluster {
+
+    message Replica {
+        string name = 1;
+        string ip = 2;
+        string port = 3;
+    }
+    repeated Replica all_replica = 1;
+}
+
+message RequestParameter {
+    string originReplica = 1;
+    uint32 key = 2;
+    string value = 3;
+
+    enum Consistency {
+        ONE = 0;
+        QUORUM = 1;
+    }
+    Consistency consistency = 4;
+    google.protobuf.Timestamp timestamp = 5;
+    int64 timeInSeconds = 6;
+}
+
+message Response {
+    string originReplica = 1;
+    uint32 key = 2;
+    string value = 3;
+    int64 arrival = 4;
+    bool status = 5;
+    string respMessage = 6;
+}
+
+message ClientRead {
+    uint32 key = 1;
+
+    enum Consistency {
+            ONE = 0;
+            QUORUM = 1;
+        }
+    Consistency consistency = 2;
+}
+
+message ReplicaRead {
+    uint32 key = 1;
+}
+
+
+message ClientPut {
+    RequestParameter input = 1;
+}
+
+
+message ReplicaPut {
+    RequestParameter input = 1;
+}
+
+message InputRequest {
+    oneof input_request {
+        InitReplicaCluster init_replica = 1;
+        ClientRead client_read = 2;
+        ReplicaRead replica_read = 3;
+        ClientPut client_put = 4;
+        ReplicaPut replica_put = 5;
+        Response response = 6;
+    }
+}
